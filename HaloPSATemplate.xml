@@ -1,0 +1,113 @@
+<?xml version="1.0"?>
+<Crm xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" Country="US" Name="HaloPSA" Version="8">
+  <Number Prefix="Off" MaxLength="[MaxLength]" />
+  <Connection MaxConcurrentRequests="2" />
+  <Parameters>
+    <Parameter Name="IntanceUrl" Type="String" Parent="General Configuration" Editor="String" Title="IntanceUrl:" Default="yourhaloinstance.halopsa.com"/>
+    <Parameter Name="ClientId" Type="String" Parent="General Configuration" Editor="String" Title="Client ID:"/>
+    <Parameter Name="ClientSecret" Type="Password" Parent="General Configuration" Editor="String" Title="Client Secret:"/>
+    <Parameter Name="Scope" Type="String" Parent="General Configuration" Editor="String" Title="Scope" Default="all"/>
+    <Parameter Name="RefreshToken" Type="OAuth" Parent="General Configuration" Editor="String" Title="Refresh Token:" RequestUrl="https://[IntanceUrl]/auth/authorize" RequestUrlParameters="response_type=code&amp;client_id=[ClientId]&amp;redirect_uri=[RedirectUri]&amp;state=[State]&amp;scope=[Scope]" ResponseScenario="OAuthGetRefreshToken" />
+    <Parameter Name="ContactUrlFragment" Type="String" Parent="General Configuration" Editor="String" Title="Contact Url Fragment:" Default="customers?userid="/>
+  </Parameters>
+  <Authentication Type="Scenario">
+    <Value>Auth</Value>
+  </Authentication>
+  <Scenarios>
+    <Scenario Id="Auth" Type="REST">
+      <Request SkipIf="" Url="https://[IntanceUrl]/auth/token" MessagePasses="0" Message="" RequestContentType="application/x-www-form-urlencoded" RequestEncoding="UrlEncoded" RequestType="Post" ResponseType="Json">
+        <PostValues>
+          <Value Key="refresh_token" Passes="0" Type="String">[RefreshToken]</Value>
+          <Value Key="grant_type" Passes="0" Type="String">refresh_token</Value>
+          <Value Key="client_id" Passes="0" Type="String">[ClientId]</Value>
+          <Value Key="client_secret" Passes="0" Type="String">[ClientSecret]</Value>
+        </PostValues>
+      </Request>
+      <Rules>
+        <Rule Type="Any">access_token</Rule>
+      </Rules>
+      <Variables>
+        <Variable Name="AccessToken" Path="access_token">
+          <Filter />
+        </Variable>
+        <Variable Name="ExpiresIn" Path="expires_in">
+          <Filter />
+        </Variable>
+      </Variables>
+      <Outputs Next="" AllowEmpty="false">
+        <Output Type="HeaderName" Passes="0" Value="Authorization" />
+        <Output Type="HeaderValue" Passes="0" Value="Bearer [AccessToken]" />
+        <Output Type="BearerExpiration" Passes="0" Value="[ExpiresIn]" />
+      </Outputs>
+    </Scenario>
+    <Scenario Id="OAuthGetRefreshToken" Type="REST">
+      <Request Url="https://[IntanceUrl]/auth/token" MessagePasses="0" RequestContentType="application/x-www-form-urlencoded" RequestEncoding="UrlEncoded" RequestType="Post" ResponseType="Json">
+        <PostValues>
+          <Value Key="code" Passes="0" Type="String">[code]</Value>
+          <Value Key="grant_type" Passes="0" Type="String">authorization_code</Value>
+          <Value Key="client_id" Passes="0" Type="String">[ClientId]</Value>
+          <Value Key="client_secret" Passes="0" Type="String">[ClientSecret]</Value>
+          <Value Key="redirect_uri" Passes="0" Type="String">[RedirectUri]</Value>
+          <Value Key="state" Passes="0" Type="String">[state]</Value>
+          <Value Key="scope" Passes="0" Type="String">all</Value>
+        </PostValues>
+      </Request>
+      <Rules>
+        <Rule Type="Any">refresh_token</Rule>
+      </Rules>
+      <Variables>
+        <Variable Name="Result" Path="refresh_token">
+          <Filter />
+        </Variable>
+      </Variables>
+      <Outputs AllowEmpty="false">
+        <Output Type="Result" Passes="0" Value="[Result]" />
+      </Outputs>
+    </Scenario>
+    <Scenario Id="" Type="REST">
+      <Request Url="https://[IntanceUrl]/api/users?search=[Number]&amp;search_phonenumbers=true" MessagePasses="0" RequestEncoding="UrlEncoded" RequestType="Get" ResponseType="Json" />
+      <Rules>
+        <Rule Type="Any">users.id</Rule>
+      </Rules>
+      <Variables>
+        <Variable Name="ContactID" Path="users.id">
+          <Filter />
+        </Variable>
+        <Variable Name="FirstName" Path="users.firstname">
+          <Filter />
+        </Variable>
+        <Variable Name="LastName" Path="users.surname">
+          <Filter />
+        </Variable>
+        <Variable Name="CompanyName" Path="users.client_name">
+          <Filter />
+        </Variable>
+        <Variable Name="Email" Path="users.emailaddress">
+          <Filter />
+        </Variable>
+        <Variable Name="PhoneBusiness" Path="users.phonenumber_preferred">
+          <Filter />
+        </Variable>
+        <Variable Name="PhoneBusiness2" Path="users.phonenumber">
+          <Filter />
+        </Variable>
+        <Variable Name="Username" Path="users.name">
+          <Filter />
+        </Variable>
+        <Variable Name="CustomValue" Path="users.phonenumber_preferred">
+          <Filter />
+        </Variable>
+      </Variables>
+      <Outputs AllowEmpty="false">
+        <Output Type="ContactID" Passes="0" Value="[ContactID]" />
+        <Output Type="FirstName" Passes="0" Value="[FirstName]" />
+        <Output Type="LastName" Passes="0" Value="[LastName]" />
+        <Output Type="CompanyName" Passes="0" Value="[CompanyName]" />
+        <Output Type="Email" Passes="0" Value="[Email]" />
+        <Output Type="PhoneBusiness" Passes="0" Value="[PhoneBusiness]" />
+        <Output Type="PhoneBusiness2" Passes="0" Value="[PhoneBusiness2]" />
+        <Output Type="ContactUrl" Passes="0" Value="https://[IntanceUrl]/[ContactUrlFragment][ContactID]" />
+      </Outputs>
+    </Scenario>
+  </Scenarios>
+</Crm>
