@@ -12,8 +12,8 @@ With the help from the Halo PSA knowledgebase and some great help from the disco
 ## Halo
 
 Add a new Halo API Application with the Auth-Code type.
-You need to add the redirect url 'https://your3cxname.3cx.de/api/oauth2crm'.
-For better security you can add the CORS or your 3CX like: https://your3cxname.3cx.de/
+You need to add the redirect url `https://your3cxname.3cx.de/api/oauth2crm`.
+For better security you can add the CORS or your 3CX like: `https://your3cxname.3cx.de/`.
 
 ## 3CX
 
