@@ -3,9 +3,14 @@
 Using the 3CX CRM Integration Templates to have lookup and link to Halo PSA.
 With the help from the Halo PSA knowledgebase and some great help from the discord community i created this simple to use template.
 
+![image](https://github.com/user-attachments/assets/ee5ac4e3-84a2-4df1-9a8d-1e262196ff41)
+
+
 # Features
 
 - Phone lookup and One Click to Halo
+- Just import it to your 3CX. No tinkering with any XML file Search an replace.
+- Custimize the Contact Uri on the fly.
 
 # Setup
 
